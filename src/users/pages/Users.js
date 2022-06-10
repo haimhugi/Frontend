@@ -6,18 +6,23 @@ import { useHttpClient } from '../../shared/hooks/http-hook';
 
 import Highlighter from 'react-highlight-words';
 
+import LoadingSpinner from '../../shared/components/UIElements/LoadingSpinner';
+
 
 const Users = () => {
     const [searchText, setSearchText] = useState('');
     const [searchedColumn, setSearchedColumn] = useState('');
     const searchInput = useRef(null);
     const [loadedUsers, setLoadedUsers] = useState();
+    const [isLoading, setIsLoading] = useState(false);
     const { sendRequest } = useHttpClient();
 
 
 
 
     useEffect(() => {
+        setIsLoading(true);
+
         const sendRequest = async () => {
             try {
                 const response = await fetch('http://localhost:5000/api/users');
@@ -26,6 +31,7 @@ const Users = () => {
             } catch (err) {
                 throw err;
             }
+            setIsLoading(false);
         };
         sendRequest();
     }, []);
@@ -186,8 +192,18 @@ const Users = () => {
             ...getColumnSearchProps('IP')
 
         }
-    ];
-    return <Table rowKey={record => record.ID} columns={columns} dataSource={loadedUsers} />;
+    ]
+    return <React.Fragment>
+        {isLoading && (
+            <div className="center">
+                <LoadingSpinner />
+            </div>
+        )}
+        {!isLoading &&
+            loadedUsers &&
+            <Table rowKey={record => record.ID} columns={columns} dataSource={loadedUsers} />
+        }
+    </React.Fragment>
 
 
 };
