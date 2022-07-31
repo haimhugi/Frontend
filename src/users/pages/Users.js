@@ -24,12 +24,38 @@ const Users = () => {
         setIsLoading(true);
 
         const sendRequest = async () => {
+            let res;
             try {
                 const response = await fetch('http://localhost:5000/api/users');
                 const responseData = await response.json();
-                setLoadedUsers(responseData.users);
+                if (responseData.users === undefined) {
+                    //  res = responseData.json({ responseData: users.map(user => user.toObject({ getters: true })) });
+                    let users = [];
+                    responseData.map(user => users.push(user))
+                    console.log("From Spring");
+                    console.log(users);
+                    setLoadedUsers(users);
+                }
+                else {
+                    responseData.users.map(user => {
+                        user.id = user.ID
+                        delete user.ID;
+                        user.email = user.Email;
+                        delete user.Email;
+                        user.ip = user.IP;
+                        delete user.IP;
+                        user.name = user.Name;
+                        delete user.Name;
+                        user.phone = user.Phone;
+                        delete user.Phone;
+                    })
+                    setLoadedUsers(responseData.users);
+                    console.log("From Node");
+                    console.log(responseData.users);
+                }
+
             } catch (err) {
-                throw err;
+                console.log(err);;
             }
             setIsLoading(false);
         };
@@ -156,40 +182,40 @@ const Users = () => {
             ),
         },
         {
-            title: 'Name',
-            dataIndex: 'Name',
-            key: 'Name',
+            title: 'name',
+            dataIndex: 'name',
+            key: 'name',
             width: '30%',
-            ...getColumnSearchProps('Name'),
-            sorter: (a, b) => a.Name < b.Name,
+            ...getColumnSearchProps('name'),
+            sorter: (a, b) => a.name < b.name,
             sortDirections: ['descend', 'ascend']
         },
         {
             title: 'ID',
-            dataIndex: 'ID',
-            key: 'ID',
-            ...getColumnSearchProps('ID'),
-            sorter: (a, b) => parseInt(a.ID) - parseInt(b.ID),
+            dataIndex: 'id',
+            key: 'id',
+            ...getColumnSearchProps('id'),
+            sorter: (a, b) => parseInt(a.id) - parseInt(b.id),
             sortDirections: ['descend', 'ascend'],
         },
         {
-            title: 'Phone',
-            dataIndex: 'Phone',
-            key: 'Phone',
-            ...getColumnSearchProps('Phone')
+            title: 'phone',
+            dataIndex: 'phone',
+            key: 'phone',
+            ...getColumnSearchProps('phone')
         },
         {
-            title: 'Email',
-            dataIndex: 'Email',
-            key: 'Email',
-            ...getColumnSearchProps('Email')
+            title: 'email',
+            dataIndex: 'email',
+            key: 'email',
+            ...getColumnSearchProps('email')
 
         },
         {
-            title: 'IP',
-            dataIndex: 'IP',
-            key: 'IP',
-            ...getColumnSearchProps('IP')
+            title: 'ip',
+            dataIndex: 'ip',
+            key: 'ip',
+            ...getColumnSearchProps('ip')
 
         }
     ]
@@ -201,7 +227,7 @@ const Users = () => {
         )}
         {!isLoading &&
             loadedUsers &&
-            <Table rowKey={record => record.ID} columns={columns} dataSource={loadedUsers} />
+            <Table rowKey={record => record.id} columns={columns} dataSource={loadedUsers} />
         }
     </React.Fragment>
 
